@@ -1,6 +1,7 @@
 use bevy::{input::keyboard::KeyCode::KeyA, prelude::*};
 use std::{default, f32::consts::FRAC_1_SQRT_2, time::Duration};
 
+use crate::ui::cutscene::Cutscene;
 use crate::ui::dialogue::Dialogue;
 
 const MAX_SPEED: f32 = 300.;
@@ -26,10 +27,10 @@ pub struct Player {
 }
 
 #[derive(Component, Default)]
-struct Velocity(Vec2);
+pub struct Velocity(pub Vec2);
 
 #[derive(Component)]
-struct Collider(Vec2);
+pub struct Collider(pub Vec2);
 
 pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
@@ -91,9 +92,9 @@ fn setup(
         Player::default(),
         Velocity::default(),
     ));
-    spawn_solid(&mut commands, Vec2::new(0., -200.), Vec2::new(1400., 40.));
-    spawn_solid(&mut commands, Vec2::new(-250., -80.), Vec2::new(160., 20.));
-    spawn_solid(&mut commands, Vec2::new(0., 0.), Vec2::new(20., 320.));
+    // spawn_solid(&mut commands, Vec2::new(0., -200.), Vec2::new(1400., 40.));
+    // spawn_solid(&mut commands, Vec2::new(-250., -80.), Vec2::new(160., 20.));
+    // spawn_solid(&mut commands, Vec2::new(0., 0.), Vec2::new(20., 320.));
 }
 
 fn move_toward(current: f32, target: f32, max_delta: f32) -> f32 {
@@ -129,16 +130,17 @@ fn update_player_animation(
     };
     state.set_if_neq(next_state);
 }
-fn handle_player_input(
+pub fn handle_player_input(
     input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
     player: Single<(&mut Velocity, &mut Player)>,
     dialogue: Res<Dialogue>,
+    cutscene: Res<Cutscene>,
 ) {
     let (mut vel, mut player) = player.into_inner();
     let dt = time.delta_secs();
 
-    let locked = dialogue.is_active();
+    let locked = dialogue.is_active() || cutscene.active();
 
     let mut h = 0.;
     if !locked {
@@ -219,7 +221,7 @@ fn box_overlaps(a_pos: Vec2, a_size: Vec2, b_pos: Vec2, b_size: Vec2) -> bool {
     delta.cmplt(min_dist).all()
 }
 
-fn move_and_collide(
+pub fn move_and_collide(
     time: Res<Time>,
     player: Single<(&mut Velocity, &mut Player, &mut Transform)>,
     solids: Query<(&Transform, &Collider), Without<Player>>,

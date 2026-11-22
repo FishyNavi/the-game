@@ -1,2 +1,2 @@
-pub mod cutscenes;
+pub mod cutscene;
 pub mod dialogue;

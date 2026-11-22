@@ -1,1 +1,1 @@
-pub mod interactables;
+pub mod interactable;

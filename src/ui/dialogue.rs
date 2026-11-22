@@ -83,6 +83,7 @@ fn setup_ui(mut commands: Commands) {
             ..default()
         },
         BackgroundColor(Color::srgba(0.1, 0., 0.1, 0.9)),
+        GlobalZIndex(100),
         Visibility::Hidden,
         children![
             (
